@@ -1,5 +1,17 @@
 # Simple Unix Shell
+
+![Build](https://github.com/ManiSalahmand/simple-unix-shell/actions/workflows/build.yml/badge.svg)
+
 A simple Unix shell implemented in C that supports command execution, pipes, redirections, and built-in commands. Built as a system programming project to understand how shells work.
+
+## Table of Contents
+
+- [Features](#features)
+- [Project Structure](#project-structure)
+- [Requirements](#requirements)
+- [Build](#build)
+- [Clean](#clean)
+- [Run](#run)
 
 ## Features
 
@@ -22,10 +34,23 @@ simple-unix-shell/
 └── .gitignore
 ```
 
+## Requirements
+
+- GCC
+- GNU Make
+
 ## Build
+
+Compile the project using the provided Makefile:
 
 ```bash
 make
+```
+
+To clean the compiled binary:
+
+```bash
+make clean
 ```
 
 ## Run
