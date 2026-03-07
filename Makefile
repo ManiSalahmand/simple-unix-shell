@@ -1,15 +1,22 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -Iinclude
 
-SRC = src/main.c
-TARGET = shell
+SRC = $(wildcard src/*.c)
+BUILD_DIR = build
+TARGET = $(BUILD_DIR)/shell
 
 all: $(TARGET)
 
-$(TARGET): $(SRC)
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
+
+$(TARGET): $(SRC) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) $(SRC) -o $(TARGET)
 
-clean:
-	rm -f $(TARGET)
+test: $(TARGET)
+	./tests/test_shell.sh
 
-.PHONY: all clean
+clean:
+	rm -rf $(BUILD_DIR)
+
+.PHONY: all test clean

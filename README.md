@@ -15,6 +15,15 @@ A simple Unix shell implemented in C that supports command execution, pipes, red
 
 ## Features
 
+Current functionality:
+- Interactive shell prompt
+- Input reading using `getline`
+- Detection and ignoring of empty / whitespace-only input
+- Clean exit on EOF (`Ctrl+D`)
+- Integration test suite
+- Continous integration build and test checks
+
+Planned features:
 - Execute external commands
 - Built-in commands (`cd`, `exit`)
 - Pipes (`|`)
@@ -26,9 +35,15 @@ A simple Unix shell implemented in C that supports command execution, pipes, red
 
 ```
 simple-unix-shell/
-├── src/        # Source files
-├── include/    # Header files
-├── build/      # Compiled output
+├── .github/workflows/  # CI pipeline
+├── build/              # Compiled output
+├── include/
+│   └── shell.h         # Project header
+├── src/
+│   ├── input.c         # Input utilities
+│   └── main.c          # Main shell loop
+├── tests/
+│   └── test_shell.sh   # Integration tests
 ├── Makefile
 ├── README.md
 └── .gitignore
@@ -47,6 +62,12 @@ Compile the project using the provided Makefile:
 make
 ```
 
+This produces the executable:
+
+```bash
+./build/shell
+```
+
 To clean the compiled binary:
 
 ```bash
@@ -55,6 +76,22 @@ make clean
 
 ## Run
 
+Start the shell with:
+
 ```bash
-./shell
+./build/shell
+```
+
+Example session:
+
+```bash
+shell> ls
+shell> pwd
+shell>
+```
+
+Exit with:
+
+```bash
+Ctrl+D
 ```
