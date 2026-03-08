@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include "shell.h"
+#include "error.h"
 
 int main(void)
 {
@@ -16,8 +17,16 @@ int main(void)
 
         if (chars_read == -1)
         {
-            printf("\n");
-            break;
+            if (feof(stdin))
+            {
+                printf("\n");
+                break;
+            }
+            else
+            {
+                print_error("getline failed");
+                continue;
+            }
         }
 
         if (is_input_empty(line))
