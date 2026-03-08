@@ -33,5 +33,6 @@ run_split_test() {
 run_split_test "prompt shown on EOF" "" "shell> " ""
 run_split_test "whitespace input ignored" "   \n" "shell> shell> " ""
 run_split_test "non-empty input reprompts without stderr" "ls\n" "shell> shell> " ""
+run_split_test "multiple commands reprompt" "ls\npwd\n" "shell> shell> shell> " ""
 
 printf "All integration tests passed.\n"

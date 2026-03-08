@@ -21,7 +21,7 @@ Current functionality:
 - Detection and ignoring of empty / whitespace-only input
 - Clean exit on EOF (`Ctrl+D`)
 - Integration test suite
-- Continous integration build and test checks
+- Continuous integration build and test checks
 
 Planned features:
 - Execute external commands
@@ -38,15 +38,18 @@ simple-unix-shell/
 ├── .github/workflows/  # CI pipeline
 ├── build/              # Compiled output
 ├── include/
-│   └── shell.h         # Project header
+│   ├── error.h         # Error handling interface
+│   └── shell.h         # Shell core declarations
 ├── src/
+│   ├── error.c         # Error handling implementation
 │   ├── input.c         # Input utilities
 │   └── main.c          # Main shell loop
 ├── tests/
 │   └── test_shell.sh   # Integration tests
+├── .gitignore
+├── LICENSE
 ├── Makefile
-├── README.md
-└── .gitignore
+└── README.md
 ```
 
 ## Requirements

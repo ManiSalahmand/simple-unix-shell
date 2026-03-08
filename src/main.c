@@ -1,38 +1,29 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include "shell.h"
 #include "error.h"
 
 int main(void)
 {
-    char *line = NULL;
-    size_t buffer_size = 0;
-    ssize_t chars_read;
+    char *line;
 
     while (1)
     {
         print_prompt();
-        chars_read = getline(&line, &buffer_size, stdin);
 
-        if (chars_read == -1)
-        {
-            if (feof(stdin))
-            {
-                printf("\n");
-                break;
-            }
-            else
-            {
-                print_error("getline failed");
-                continue;
-            }
-        }
+        line = read_input();
+
+        if (line == NULL)
+            continue;
 
         if (is_input_empty(line))
+        {
+            free(line);
             continue;
+        }
+
+        free(line);
     }
 
-    free(line);
     return 0;
 }
