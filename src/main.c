@@ -1,17 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "shell.h"
 #include "error.h"
+#include "parser.h"
+#include "shell.h"
 
 int main(void)
 {
-    char *line;
-
     while (1)
     {
         print_prompt();
 
-        line = read_input();
+        char *line = read_input();
 
         if (line == NULL)
             continue;
@@ -22,7 +21,16 @@ int main(void)
             continue;
         }
 
+        Command *command = parse_command_line(line);
         free(line);
+
+        if (command == NULL)
+        {
+            print_error("command parsing failed");
+            continue;
+        }
+
+        free_command(command);
     }
 
     return 0;

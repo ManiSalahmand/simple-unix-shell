@@ -39,11 +39,13 @@ simple-unix-shell/
 ├── build/              # Compiled output
 ├── include/
 │   ├── error.h         # Error handling interface
+│   ├── parser.h        # Command line parsing interface
 │   └── shell.h         # Shell core declarations
 ├── src/
 │   ├── error.c         # Error handling implementation
 │   ├── input.c         # Input utilities
-│   └── main.c          # Main shell loop
+│   ├── main.c          # Main shell loop
+│   └── parser.c        # Command line parsing implementation
 ├── tests/
 │   └── test_shell.sh   # Integration tests
 ├── .gitignore
