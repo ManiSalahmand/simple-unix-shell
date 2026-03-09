@@ -2,6 +2,8 @@
 
 set -eu
 
+make >/dev/null
+
 run_split_test() {
     name="$1"
     input="$2"
@@ -34,5 +36,7 @@ run_split_test "prompt shown on EOF" "" "shell> " ""
 run_split_test "whitespace input ignored" "   \n" "shell> shell> " ""
 run_split_test "non-empty input reprompts without stderr" "ls\n" "shell> shell> " ""
 run_split_test "multiple commands reprompt" "ls\npwd\n" "shell> shell> shell> " ""
+run_split_test "command with surrounding spaces" "   ls   \n" "shell> shell> " ""
+run_split_test "tab separated input reprompts" "ls\t-l\n" "shell> shell> " ""
 
 printf "All integration tests passed.\n"
