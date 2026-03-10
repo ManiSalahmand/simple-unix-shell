@@ -32,11 +32,45 @@ run_split_test() {
     fi
 }
 
+run_regex_test() {
+    name="$1"
+    input="$2"
+    stdout_pattern="$3"
+    stderr_pattern="$4"
+
+    stdout_file=$(mktemp)
+    stderr_file=$(mktemp)
+
+    printf "%b" "$input" | ./build/shell >"$stdout_file" 2>"$stderr_file"
+
+    if grep -Eq "$stdout_pattern" "$stdout_file" && grep -Eq "$stderr_pattern" "$stderr_file"; then
+        printf "PASS: %s\n" "$name"
+    else
+        printf "FAIL: %s\n" "$name"
+        printf "Expected stdout pattern: [%s]\n" "$stdout_pattern"
+        printf "Got stdout:              [%s]\n" "$(cat "$stdout_file")"
+        printf "Expected stderr pattern: [%s]\n" "$stderr_pattern"
+        printf "Got stderr:              [%s]\n" "$(cat "$stderr_file")"
+        rm -f "$stdout_file" "$stderr_file"
+        exit 1
+    fi
+
+    rm -f "$stdout_file" "$stderr_file"
+}
+
+current_dir=$(pwd)
+
 run_split_test "prompt shown on EOF" "" "shell> " ""
 run_split_test "whitespace input ignored" "   \n" "shell> shell> " ""
-run_split_test "non-empty input reprompts without stderr" "ls\n" "shell> shell> " ""
-run_split_test "multiple commands reprompt" "ls\npwd\n" "shell> shell> shell> " ""
-run_split_test "command with surrounding spaces" "   ls   \n" "shell> shell> " ""
-run_split_test "tab separated input reprompts" "ls\t-l\n" "shell> shell> " ""
+run_split_test "echo command executes" "echo hello\n" "shell> hello
+shell> " ""
+run_split_test "echo command with arguments executes" "echo hello world\n" "shell> hello world
+shell> " ""
+run_split_test "pwd command executes" "pwd\n" "shell> $current_dir
+shell> " ""
+run_split_test "multiple commands execute in sequence" "echo first\necho second\n" "shell> first
+shell> second
+shell> " ""
+run_regex_test "invalid command prints error and reprompts" "notacommand\n" '^shell> shell> $' '^notacommand: .+$'
 
 printf "All integration tests passed.\n"
