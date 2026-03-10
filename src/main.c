@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "error.h"
+#include "executor.h"
 #include "parser.h"
 #include "shell.h"
 
@@ -30,6 +32,7 @@ int main(void)
             continue;
         }
 
+        execute_command(command);
         free_command(command);
     }
 
