@@ -71,6 +71,9 @@ shell> " ""
 run_split_test "multiple commands execute in sequence" "echo first\necho second\n" "shell> first
 shell> second
 shell> " ""
+
 run_regex_test "invalid command prints error and reprompts" "notacommand\n" '^shell> shell> $' '^notacommand: .+$'
+
+pytest
 
 printf "All integration tests passed.\n"

@@ -1,12 +1,22 @@
 # Build directory
 build/
-
-# Object files
 *.o
-
-# Executables
-shell
 *.out
+*.a
+*.so
+
+# Binaries
+shell
+
+# Python
+__pycache__/
+*.py[cod]
+*.pytest_cache/
+
+# Python virtual environments
+.venv/
+venv/
+env/
 
 # Debug files
 *.dSYM/

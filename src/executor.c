@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <signal.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -27,6 +28,7 @@ int execute_command(const Command *command)
 
     if (pid == 0)
     {
+        signal(SIGINT, SIG_DFL);
         execvp(command->name, command->argv);
         print_error(command->name);
         exit(EXIT_FAILURE);

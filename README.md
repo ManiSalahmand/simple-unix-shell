@@ -26,6 +26,7 @@ Current functionality:
 - Execution of external commands using `fork()` + `execvp()`
 - Parent process waits for child process using `waitpid()`
 - Clean exit on EOF (`Ctrl+D`)
+- Handle `SIGINT` (`Ctrl+C`) without existing the shell
 - Integration test suite
 - Continuous integration build and test checks
 
@@ -35,7 +36,6 @@ Planned features:
 - Input redirection (`<`)
 - Output redirection (`>`)
 - Background processes (`&`)
-- Signal handling (`SIGNINT`)
 - Command history
 - Tab completion
 - Environment variable support
@@ -45,21 +45,24 @@ Planned features:
 
 ```
 simple-unix-shell/
-├── .github/workflows/  # CI pipeline
-├── build/              # Compiled output
+├── .github/workflows/      # CI pipeline
+├── build/                  # Compiled output
 ├── include/
-│   ├── error.h         # Error handling interface
-│   ├── executor.h      # Command execution interface
-│   ├── parser.h        # Command line parsing interface
-│   └── shell.h         # Shell core declarations
+│   ├── error.h             # Error handling interface
+│   ├── executor.h          # Command execution interface
+│   ├── parser.h            # Command line parsing interface
+│   ├── shell.h             # Shell core declarations
+│   └── signal_handler.h    # Signal handling interface
 ├── src/
-│   ├── error.c         # Error handling implementation
-│   ├── executor.c      # Command execution (fork + exec)
-│   ├── input.c         # Input utilities
-│   ├── main.c          # Main shell loop
-│   └── parser.c        # Command line parsing implementation
+│   ├── error.c             # Error handling implementation
+│   ├── executor.c          # Command execution (fork + exec)
+│   ├── input.c             # Input utilities
+│   ├── main.c              # Main shell loop
+│   ├── parser.c            # Command line parsing implementation
+│   └── signals.c           # Signal handling implementation
 ├── tests/
-│   └── test_shell.sh   # Integration tests
+│   ├── test_shell.sh       # Integration tests
+│   └── test_sigint.py      # SIGINT behavior tests
 ├── .gitignore
 ├── LICENSE
 ├── Makefile
@@ -71,6 +74,8 @@ simple-unix-shell/
 - GCC
 - GNU Make
 - POSIX-compatible system (Linux / macOS / WSL)
+- Python 3
+- pytest
 
 ## Build
 
@@ -124,6 +129,9 @@ make test
 The tests verify:
 - prompt behavior
 - whitespace handling
-- command parsing
-- command execution
+- command parsing and argument handling
+- execution of valid commands
 - handling of invalid commands
+- execution of multiple commands in sequence
+- correct handling of `SIGNINT` (`Ctrl+C`)
+- interruption of child processes without terminating the shell

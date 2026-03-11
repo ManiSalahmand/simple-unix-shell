@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -Iinclude
+CFLAGS = -Wall -Wextra -Werror -pedantic -std=c11 -D_POSIX_C_SOURCE=200809L -Iinclude
 
 SRC = $(wildcard src/*.c)
 BUILD_DIR = build
