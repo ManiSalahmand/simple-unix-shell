@@ -5,15 +5,21 @@
 #include "executor.h"
 #include "parser.h"
 #include "shell.h"
+#include "signal_handler.h"
 
 int main(void)
 {
+    if (setup_signal_handlers() == -1)
+    {
+        print_error("sigaction failed");
+        return EXIT_FAILURE;
+    }
+
     while (1)
     {
         print_prompt();
 
         char *line = read_input();
-
         if (line == NULL)
             continue;
 

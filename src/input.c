@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -59,6 +60,12 @@ char *read_input(void)
         {
             printf("\n");
             exit(0);
+        }
+
+        if (errno == EINTR)
+        {
+            clearerr(stdin);
+            return NULL;
         }
 
         print_error("getline failed");
