@@ -58,6 +58,7 @@ run_regex_test() {
     rm -f "$stdout_file" "$stderr_file"
 }
 
+home_dir=${HOME:-}
 current_dir=$(pwd)
 
 run_split_test "prompt shown on EOF" "" "shell> " ""
@@ -71,8 +72,27 @@ shell> " ""
 run_split_test "multiple commands execute in sequence" "echo first\necho second\n" "shell> first
 shell> second
 shell> " ""
+run_split_test "cd changes working directory for sobsequent commands" "cd /
+pwd
+" "shell> shell> /
+shell> " ""
+run_split_test "cd with too many arguments prints error" "cd / tmp
+" "shell> shell> " "shell: cd: too many arguments"
+if [ -n "$home_dir" ]; then
+    run_split_test "cd with no arguments uses HOME" "cd
+pwd
+" "shell> shell> $home_dir
+shell> " ""
+fi
+run_split_test "exit builtin terminates shell" "exit
+" "shell> " ""
+run_split_test "exit with too many arguments prints error" "exit now
+exit
+" "shell> shell> " "shell: exit: too many arguments"
 
 run_regex_test "invalid command prints error and reprompts" "notacommand\n" '^shell> shell> $' '^notacommand: .+$'
+run_regex_test "cd invalid path prints error and reprompts" "cd /definitely/not/a/real/path
+" '^shell> shell> $' '^cd: .+$'
 
 pytest
 

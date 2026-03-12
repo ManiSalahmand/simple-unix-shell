@@ -5,11 +5,12 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include "builtin.h"
 #include "executor.h"
 #include "error.h"
 
 /**
- * @brief Execute a parsed command in a child process.
+ * @brief Execute a parsed command.
  *
  * @param command Pointer to a parsed command structure.
  * @return int The child process status on success, or -1 on failure.
@@ -18,6 +19,9 @@ int execute_command(const Command *command)
 {
     if (command == NULL || command->argv == NULL || command->name == NULL)
         return -1;
+
+    if (try_execute_builtin(command) == 0)
+        return 0;
 
     pid_t pid = fork();
     if (pid == -1)
