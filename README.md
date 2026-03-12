@@ -27,11 +27,11 @@ Current functionality:
 - Parent process waits for child process using `waitpid()`
 - Clean exit on EOF (`Ctrl+D`)
 - Handle `SIGINT` (`Ctrl+C`) without existing the shell
+- Built-in commands (`cd`, `exit`)
 - Integration test suite
 - Continuous integration build and test checks
 
 Planned features:
-- Built-in commands (`cd`, `exit`)
 - Pipes (`|`)
 - Input redirection (`<`)
 - Output redirection (`>`)
@@ -45,24 +45,26 @@ Planned features:
 
 ```
 simple-unix-shell/
-├── .github/workflows/      # CI pipeline
-├── build/                  # Compiled output
+├── .github/workflows/
+├── build/
 ├── include/
-│   ├── error.h             # Error handling interface
-│   ├── executor.h          # Command execution interface
-│   ├── parser.h            # Command line parsing interface
-│   ├── shell.h             # Shell core declarations
-│   └── signal_handler.h    # Signal handling interface
+│   ├── builtin.h
+│   ├── error.h
+│   ├── executor.h
+│   ├── parser.h
+│   ├── shell.h
+│   └── signal_handler.h
 ├── src/
-│   ├── error.c             # Error handling implementation
-│   ├── executor.c          # Command execution (fork + exec)
-│   ├── input.c             # Input utilities
-│   ├── main.c              # Main shell loop
-│   ├── parser.c            # Command line parsing implementation
-│   └── signals.c           # Signal handling implementation
+│   ├── builtin.c
+│   ├── error.c
+│   ├── executor.c
+│   ├── input.c
+│   ├── main.c
+│   ├── parser.c
+│   └── signals.c
 ├── tests/
-│   ├── test_shell.sh       # Integration tests
-│   └── test_sigint.py      # SIGINT behavior tests
+│   ├── test_shell.sh
+│   └── test_sigint.py
 ├── .gitignore
 ├── LICENSE
 ├── Makefile
@@ -135,3 +137,4 @@ The tests verify:
 - execution of multiple commands in sequence
 - correct handling of `SIGNINT` (`Ctrl+C`)
 - interruption of child processes without terminating the shell
+- `cd` and `exit` builtins
