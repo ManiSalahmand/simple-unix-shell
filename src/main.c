@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "builtin.h"
 #include "error.h"
 #include "executor.h"
 #include "parser.h"
@@ -15,7 +16,7 @@ int main(void)
         return EXIT_FAILURE;
     }
 
-    while (1)
+    while (!shell_should_exit)
     {
         print_prompt();
 
