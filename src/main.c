@@ -34,10 +34,7 @@ int main(void)
         free(line);
 
         if (command == NULL)
-        {
-            print_error("command parsing failed");
             continue;
-        }
 
         execute_command(command);
         free_command(command);

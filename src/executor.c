@@ -1,4 +1,5 @@
 #include <errno.h>
+#include <fcntl.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -32,6 +33,45 @@ int execute_command(const Command *command)
 
     if (pid == 0)
     {
+        if (command->input_file != NULL)
+        {
+            int fd = open(command->input_file, O_RDONLY);
+
+            if (fd < 0)
+            {
+                print_error("open");
+                exit(EXIT_FAILURE);
+            }
+
+            if (dup2(fd, STDIN_FILENO) < 0)
+            {
+                print_error("dup2");
+                close(fd);
+                exit(EXIT_FAILURE);
+            }
+
+            close(fd);
+        }
+
+        if (command->output_file != NULL)
+        {
+            int fd = open(command->output_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (fd < 0)
+            {
+                print_error("open");
+                exit(EXIT_FAILURE);
+            }
+
+            if (dup2(fd, STDOUT_FILENO) < 0)
+            {
+                close(fd);
+                print_error("dup2");
+                exit(EXIT_FAILURE);
+            }
+
+            close(fd);
+        }
+
         signal(SIGINT, SIG_DFL);
         execvp(command->name, command->argv);
         print_error(command->name);

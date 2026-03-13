@@ -61,6 +61,13 @@ run_regex_test() {
 home_dir=${HOME:-}
 current_dir=$(pwd)
 
+redir_input_file=$(mktemp)
+redir_output_file=$(mktemp)
+missing_input_file="/tmp/simple-unix/shell-missing-$$"
+printf "banana\napple\ncarrot\n" > "$redir_input_file"
+printf "old content\n" > "$redir_output_file"
+rm -f "$missing_input_file"
+
 run_split_test "prompt shown on EOF" "" "shell> " ""
 run_split_test "whitespace input ignored" "   \n" "shell> shell> " ""
 run_split_test "echo command executes" "echo hello\n" "shell> hello
@@ -89,10 +96,64 @@ run_split_test "exit builtin terminates shell" "exit
 run_split_test "exit with too many arguments prints error" "exit now
 exit
 " "shell> shell> " "shell: exit: too many arguments"
+run_split_test "input redirection with cat" \
+"cat < $redir_input_file
+" \
+"shell> banana
+apple
+carrot
+shell> " \
+""
+run_split_test "input redirection with sort" \
+"sort < $redir_input_file
+" \
+"shell> apple
+banana
+carrot
+shell> " \
+""
+run_split_test "output redirection writes to file" \
+"echo hello > $redir_output_file
+cat $redir_output_file
+" \
+"shell> shell> hello
+shell> " \
+""
+run_split_test "output redirection truncates existing file" \
+"echo new > $redir_output_file
+cat $redir_output_file
+" \
+"shell> shell> new
+shell> " \
+""
+run_split_test "combined input and output redirection" \
+"sort < $redir_input_file > $redir_output_file
+cat $redir_output_file
+" \
+"shell> shell> apple
+banana
+carrot
+shell> " \
+""
+run_split_test "missing filename after input redirection is ignored safely" \
+"cat <
+" \
+"shell> shell> " \
+"shell: parser: missing filename after '<'"
+run_split_test "missing filename after output redirection is ignored safely" \
+"echo hello >
+" \
+"shell> shell> " \
+"shell: parser: missing filename after '>'"
 
 run_regex_test "invalid command prints error and reprompts" "notacommand\n" '^shell> shell> $' '^notacommand: .+$'
 run_regex_test "cd invalid path prints error and reprompts" "cd /definitely/not/a/real/path
 " '^shell> shell> $' '^cd: .+$'
+run_regex_test "input redirection missing file prints error" \
+"cat < $missing_input_file
+" \
+'^shell> shell> $' \
+'^open: .+$'
 
 pytest
 

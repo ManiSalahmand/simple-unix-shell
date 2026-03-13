@@ -4,7 +4,7 @@
 
 A simple Unix shell implemented in C to understand how Unix shells work internally.
 The project demonstrates core system programming concepts such as process
-creation, command parsing, and program execution using `fork()` and `execvp()`.
+creation, command parsing, file descriptor manipulation, and and program execution using `fork()`, `execvp()`, and `dup2()`.
 
 ## Table of Contents
 
@@ -28,13 +28,13 @@ Current functionality:
 - Clean exit on EOF (`Ctrl+D`)
 - Handle `SIGINT` (`Ctrl+C`) without existing the shell
 - Built-in commands (`cd`, `exit`)
+- Input redirection (`<`)
+- Output redirection (`>`)
 - Integration test suite
 - Continuous integration build and test checks
 
 Planned features:
 - Pipes (`|`)
-- Input redirection (`<`)
-- Output redirection (`>`)
 - Background processes (`&`)
 - Command history
 - Tab completion
@@ -138,3 +138,12 @@ The tests verify:
 - correct handling of `SIGNINT` (`Ctrl+C`)
 - interruption of child processes without terminating the shell
 - `cd` and `exit` builtins
+- input redirection (`<`)
+- output redirection (`>`)
+- combined input and output redirection
+- correct error handling for missing files
+- syntax errors such as missing filenames after `<` or `>`
+
+Tests are implemented using:
+- shell-based integration tests (`test/test_shell.sh`)
+- Python based signal tests (`tests/test_sigint.py`)

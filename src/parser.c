@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "error.h"
 #include "parser.h"
 
 /**
@@ -52,6 +53,12 @@ static void free_partial_command(Command *command, int filled)
         free(command->argv);
     }
 
+    if (command->input_file != NULL)
+        free(command->input_file);
+
+    if (command->output_file != NULL)
+        free(command->output_file);
+
     free(command);
 }
 
@@ -78,6 +85,8 @@ Command *parse_command_line(const char* input)
 
     command->argc = token_count;
     command->name = NULL;
+    command->input_file = NULL;
+    command->output_file = NULL;
     command->argv = malloc(sizeof(char *) * (token_count + 1));
     if (command->argv == NULL)
     {
@@ -99,6 +108,52 @@ Command *parse_command_line(const char* input)
 
     while (token != NULL)
     {
+        if (strcmp(token, "<") == 0)
+        {
+            token = strtok_r(NULL, " \t\n", &saveptr);
+            if (token == NULL)
+            {
+                shell_error("parser", "missing filename after '<'");
+                free(copy);
+                free_partial_command(command, i);
+                return NULL;
+            }
+
+            command->input_file = strdup(token);
+            if (command->input_file == NULL)
+            {
+                free(copy);
+                free_partial_command(command, i);
+                return NULL;
+            }
+
+            token = strtok_r(NULL, " \t\n", &saveptr);
+            continue;
+        }
+
+        if (strcmp(token, ">") == 0)
+        {
+            token = strtok_r(NULL, " \t\n", &saveptr);
+            if (token == NULL)
+            {
+                shell_error("parser", "missing filename after '>'");
+                free(copy);
+                free_partial_command(command, i);
+                return NULL;
+            }
+            command->output_file = strdup(token);
+            if (command->output_file == NULL)
+            {
+                print_error("command parsing failed");
+                free(copy);
+                free_partial_command(command, i);
+                return NULL;
+            }
+
+            token = strtok_r(NULL, " \t\n", &saveptr);
+            continue;
+        }
+
         command->argv[i] = strdup(token);
         if (command->argv[i] == NULL)
         {
@@ -112,7 +167,10 @@ Command *parse_command_line(const char* input)
     }
 
     command->argv[i] = NULL;
-    command->name = command->argv[0];
+    command->argc = i;
+
+    if (i > 0)
+        command->name = command->argv[0];
 
     free(copy);
     return command;
@@ -135,6 +193,12 @@ void free_command(Command *command)
 
         free(command->argv);
     }
+
+    if (command->input_file != NULL)
+        free(command->input_file);
+
+    if (command->output_file != NULL)
+        free(command->output_file);
 
     free(command);
 }
