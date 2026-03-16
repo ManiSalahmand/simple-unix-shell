@@ -6,7 +6,10 @@
 #include "parser.h"
 
 /**
- * @brief Counts the number of tokens (arguments) in the input string.
+ * @brief Count whitespace-separated tokens in the input string.
+ *
+ * This counts all raw tokens in the command line before any parsing
+ * rules are applied for redirection operators.
  *
  * @param input The input command line string to analyze.
  * @return int The number of detected tokens in the input string.
@@ -35,7 +38,10 @@ static int count_tokens(const char *input)
 }
 
 /**
- * @brief Frees partially allocated memory for a Command structure.
+ * @brief Free a partially initialized Command structure.
+ *
+ * Used during parse failures to release only the memory that was
+ * successfully allocated so far.
  *
  * @param command Pointer to the Command structure being cleaned up.
  * @param filled Number of argument entries in argv that were successfully allocated.
@@ -65,10 +71,13 @@ static void free_partial_command(Command *command, int filled)
 /**
  * @brief Parses a command line string into a Command structure.
  *
+ * Splits the input into tokens, stores command arguments in argv,
+ * and extracts input/output redirection filenames when present.
+ *
  * @param input The raw command line input string entered by the user.
  * @return Command* Pointer to a newly allocated Command structure on
- *                  success, or NULL if parsing fails or the input contains no
- *                  tokens.
+ *                  success, or NULL if parsing fails or the input
+ *                  contains no tokens.
  */
 Command *parse_command_line(const char* input)
 {
@@ -169,6 +178,7 @@ Command *parse_command_line(const char* input)
     command->argv[i] = NULL;
     command->argc = i;
 
+    // The command name is always the first argument, if one exists.
     if (i > 0)
         command->name = command->argv[0];
 

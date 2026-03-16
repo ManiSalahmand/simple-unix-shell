@@ -4,6 +4,7 @@ set -eu
 
 make >/dev/null
 
+# Track temporary files created during the test run so they can be cleaned up.
 TMP_FILES=""
 
 create_temp_file() {
@@ -16,6 +17,7 @@ cleanup() {
     rm -f $TMP_FILES
 }
 
+# Always clean up temp files when the script exits or is interrupted.
 trap cleanup EXIT INT TERM
 
 run_shell() {
@@ -23,6 +25,7 @@ run_shell() {
     stdout_file="$2"
     stderr_file="$3"
 
+    # Feed test input to the shell and capture stdout/stderr separately.
     printf "%b" "$input" | ./build/shell >"$stdout_file" 2>"$stderr_file"
 }
 
@@ -55,6 +58,7 @@ run_split_test() {
     actual_stdout=$(cat "$stdout_file")
     actual_stderr=$(cat "$stderr_file")
 
+    # Exact-match test for stdout and stderr
     if [ "$actual_stdout" = "$expected_stdout" ] &&
        [ "$actual_stderr" = "$expected_stderr" ]; then
         printf "PASS: %s\n" "$name"
@@ -79,6 +83,7 @@ run_regex_test() {
 
     run_shell "$input" "$stdout_file" "$stderr_file"
 
+    # Regex-based test for cases where exact system error text may vary.
     if grep -Eq "$stdout_pattern" "$stdout_file" &&
        grep -Eq "$stderr_pattern" "$stderr_file"; then
         printf "PASS: %s\n" "$name"
@@ -95,6 +100,7 @@ run_regex_test() {
 home_dir=${HOME:-}
 current_dir=$(pwd)
 
+# Files used by redirection-related integration tests.
 redir_input_file=$(create_temp_file)
 redir_output_file=$(create_temp_file)
 missing_input_file="/tmp/simple-unix/shell-missing-$$"

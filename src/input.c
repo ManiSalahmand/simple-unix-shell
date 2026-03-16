@@ -9,21 +9,20 @@
 #include "shell.h"
 
 /**
- * @brief Displays the shell prompt to the user.
- *
+ * @brief Displays the shell prompt.
  */
 void print_prompt(void)
 {
     printf("shell> ");
-    fflush(stdout);
+    fflush(stdout); // ensure the prompt appears immediately
 }
 
 /**
  * @brief Checks whether the input string contains only whitespace characters.
  *
  * @param input The input string to check.
- * @return bool Returns true if the input is empty or contains only
- *              whitespace characters, otherwise returns false.
+ * @return bool Returns true if the input is NULL or contains only
+ *              whitespace characters, otherwise false.
  */
 bool is_input_empty(const char* input)
 {
@@ -40,9 +39,13 @@ bool is_input_empty(const char* input)
 }
 
 /**
- * @brief Reads a line of input from the user.
+ * @brief Reads a line of input from stdin.
  *
- * @return char* Pointer to input string (must be freed by caller).
+ * Uses getline() to dynamically allocate a buffer large enough
+ * to hold the full input line.
+ *
+ * @return char* Pointer to input string (must be freed by caller)
+ *               or NULL if the read was interrupted or failed.
  */
 char *read_input(void)
 {
@@ -56,12 +59,14 @@ char *read_input(void)
     {
         free(line);
 
+        // Exit the shell cleanly on EOF (Ctrl+D)
         if (feof(stdin))
         {
             printf("\n");
             exit(0);
         }
 
+        // If interrupted by a signal (e.g., Ctrl+C), retry the loop
         if (errno == EINTR)
         {
             clearerr(stdin);
@@ -78,7 +83,10 @@ char *read_input(void)
 }
 
 /**
- * @brief Removes the trailing newline from input if present.
+ * @brief Removes the trailing newline from an input string.
+ *
+ * getline() stores the newline character if present, so this
+ * function replaces it with a null terminator.
  *
  * @param input Input string returned by getline().
  */

@@ -45,12 +45,12 @@ def test_sigint_at_prompt() -> None:
     slave_fd: int
     master_fd, slave_fd = pty.openpty()
 
-    proc = subprocess.Popen(
+    proc: subprocess.Popen[bytes] = subprocess.Popen(
         [BUILD_SHELL],
         stdin=slave_fd,
         stdout=slave_fd,
         stderr=slave_fd,
-        preexec_fn=os.setsid,
+        preexec_fn=os.setsid, # start shell in its own process group
         close_fds=True
     )
 
@@ -85,12 +85,12 @@ def test_sigint_interrupts_child_not_shell() -> None:
     slave_fd: int
     master_fd, slave_fd = pty.openpty()
 
-    proc = subprocess.Popen(
+    proc: subprocess.Popen[bytes] = subprocess.Popen(
         [BUILD_SHELL],
         stdin=slave_fd,
         stdout=slave_fd,
         stderr=slave_fd,
-        preexec_fn=os.setsid,
+        preexec_fn=os.setsid, # allow SIGINT to be sent to the whole shell process group
         close_fds=True
     )
 
@@ -98,8 +98,8 @@ def test_sigint_interrupts_child_not_shell() -> None:
 
     try:
         read_until(master_fd, b'shell> ')
-        os.write(master_fd, b'sleep 5\n')
-        time.sleep(0.2)
+        os.write(master_fd, b'sleep 5\n') # launch a long-running child command
+        time.sleep(0.2) # give the child time to start before sending SIGINT
         os.killpg(proc.pid, signal.SIGINT)
         read_until(master_fd, b'shell> ')
 
