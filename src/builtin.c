@@ -5,10 +5,14 @@
 #include "builtin.h"
 #include "error.h"
 
+// Set by the exit builtin to terminate the main shell loop.
 bool shell_should_exit = false;
 
 /**
  * @brief Handle the `exit` builtin command.
+ *
+ * Sets the global shell exit flag so the main loop can terminate
+ * cleanly after the current iteration.
  *
  * @param command Pointer to the parsed Command structure representing
  *                the `exit` command and its arguments.
@@ -28,6 +32,10 @@ static int handle_exit(const Command *command)
 
 /**
  * @brief Handle the `cd` builtin command.
+ *
+ * Changes the current working directory of the shell process.
+ * If no path is provided, the shell changes to the directory
+ * specified by the HOME environment variable.
  *
  * @param command Pointer to the parsed Command structure containing the
  *                argument vector for the `cd` command.
@@ -69,6 +77,9 @@ static int handle_cd(const Command *command)
 
 /**
  * @brief Attempt to execute a builtin command.
+ *
+ * Recognizes supported shell builtins and executes them in the
+ * current shell process.
  *
  * @param command Pointer to the parsed command structure containing the
  *                command and argument vector.
