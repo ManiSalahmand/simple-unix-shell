@@ -100,13 +100,16 @@ run_regex_test() {
 home_dir=${HOME:-}
 current_dir=$(pwd)
 
-# Files used by redirection-related integration tests.
+# Files used by integration tests.
 redir_input_file=$(create_temp_file)
 redir_output_file=$(create_temp_file)
-missing_input_file="/tmp/simple-unix/shell-missing-$$"
+pipe_input_file=$(create_temp_file)
+pipe_output_file=$(create_temp_file)
+missing_input_file="${redir_input_file}.missing"
 
 printf "banana\napple\ncarrot\n" >"$redir_input_file"
 printf "old content\n" >"$redir_output_file"
+printf "banana\napple\ncarrot\n" >"$pipe_input_file"
 rm -f "$missing_input_file"
 
 run_split_test "prompt shown on EOF" "" "shell> " ""
@@ -229,6 +232,59 @@ run_split_test "missing filename after output redirection is ignored safely" \
 " \
 "shell> shell> " \
 "shell: parser: missing filename after '>'"
+
+run_split_test "single pipe passes stdout to next command" \
+"cat $pipe_input_file | sort
+" \
+"shell> apple
+banana
+carrot
+shell> " \
+""
+
+run_split_test "multiple pipes execute in sequence" \
+"cat $pipe_input_file | sort | wc -l
+" \
+"shell> 3
+shell> " \
+""
+
+run_split_test "pipe works with output redirection on final command" \
+"cat $pipe_input_file | sort > $pipe_output_file
+cat $pipe_output_file
+" \
+"shell> shell> apple
+banana
+carrot
+shell> " \
+""
+
+run_split_test "pipe works with input redirection on first command" \
+"cat < $pipe_input_file | sort
+" \
+"shell> apple
+banana
+carrot
+shell> " \
+""
+
+run_split_test "leading pipe is handled safely" \
+"| ls
+" \
+"shell> shell> " \
+"shell: parser: missing command near '|'"
+
+run_split_test "trailing pipe is handled safely" \
+"echo hello |
+" \
+"shell> shell> " \
+"shell: parser: missing command near '|'"
+
+run_split_test "consecutive pipes are handled safely" \
+"ls | | wc
+" \
+"shell> shell> " \
+"shell: parser: missing command near '|'"
 
 run_regex_test "invalid command prints error and reprompts" \
 "notacommand\n" \
