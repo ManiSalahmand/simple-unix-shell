@@ -4,7 +4,7 @@
 
 A simple Unix shell implemented in C to understand how Unix shells work internally.
 The project demonstrates core system programming concepts such as process
-creation, command parsing, file descriptor manipulation, and and program execution using `fork()`, `execvp()`, and `dup2()`.
+creation, command parsing, pipelines, file descriptor manipulation, and and program execution using `fork()`, `execvp()`, and `dup2()`.
 
 ## Table of Contents
 
@@ -30,16 +30,9 @@ Current functionality:
 - Built-in commands (`cd`, `exit`)
 - Input redirection (`<`)
 - Output redirection (`>`)
+- Pipes (`|`)
 - Integration test suite
 - Continuous integration build and test checks
-
-Planned features:
-- Pipes (`|`)
-- Background processes (`&`)
-- Command history
-- Tab completion
-- Environment variable support
-- Job control
 
 ## Project Structure
 
@@ -142,7 +135,10 @@ The tests verify:
 - output redirection (`>`)
 - combined input and output redirection
 - correct error handling for missing files
-- syntax errors such as missing filenames after `<` or `>`
+- syntax errors such as:
+  - missing filenames after `<` or `>`
+  - invalid pipe usage (`|`)
+  - trailing or consecutive pipes
 
 Tests are implemented using:
 - shell-based integration tests (`test/test_shell.sh`)
